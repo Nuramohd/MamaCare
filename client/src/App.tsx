@@ -6,7 +6,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { BottomNavigation } from "@/components/bottom-navigation";
 import { useEffect, useState } from "react";
 import { auth } from "@/lib/firebase";
-import { User } from "firebase/auth";
+import type { User } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 
 // Pages
 import Home from "@/pages/home";
@@ -22,7 +23,7 @@ function Router() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       setFirebaseUser(user);
       setLoading(false);
     });

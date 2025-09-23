@@ -1,7 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { auth } from "@/lib/firebase";
-import { User } from "firebase/auth";
+import type { User as FirebaseUser } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
+import type { User, Child, Pregnancy, HealthReminder, CommunityPost } from "@shared/schema";
+import { User as UserIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChildCard } from "@/components/child-card";
@@ -13,50 +16,50 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export default function Home() {
-  const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
+  const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
   const [pregnancyWheelOpen, setPregnancyWheelOpen] = useState(false);
   const [lmpDate, setLmpDate] = useState("");
   const [calculatedWeeks, setCalculatedWeeks] = useState({ weeks: 0, days: 0 });
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       setFirebaseUser(user);
     });
     return () => unsubscribe();
   }, []);
 
   // Fetch user profile data
-  const { data: userProfile } = useQuery({
+  const { data: userProfile } = useQuery<User>({
     queryKey: ['/api/users/profile'],
     enabled: !!firebaseUser,
   });
 
   // Fetch children data
-  const { data: children = [] } = useQuery({
+  const { data: children = [] } = useQuery<Child[]>({
     queryKey: ['/api/children'],
     enabled: !!firebaseUser,
   });
 
   // Fetch active pregnancy
-  const { data: activePregnancy } = useQuery({
+  const { data: activePregnancy } = useQuery<Pregnancy | null>({
     queryKey: ['/api/pregnancies/active'],
     enabled: !!firebaseUser,
   });
 
   // Fetch upcoming reminders
-  const { data: reminders = [] } = useQuery({
+  const { data: reminders = [] } = useQuery<HealthReminder[]>({
     queryKey: ['/api/reminders/upcoming'],
     enabled: !!firebaseUser,
   });
 
   // Fetch health tips
-  const { data: healthTips = [] } = useQuery({
+  const { data: healthTips = [] } = useQuery<any[]>({
     queryKey: ['/api/health-tips'],
     enabled: !!firebaseUser,
   });
 
   // Fetch community highlights
-  const { data: communityPosts = [] } = useQuery({
+  const { data: communityPosts = [] } = useQuery<CommunityPost[]>({
     queryKey: ['/api/community/highlights'],
     enabled: !!firebaseUser,
   });
@@ -117,7 +120,7 @@ export default function Home() {
             </div>
           </div>
           <Button variant="outline" size="icon" data-testid="button-profile-header">
-            <User className="w-4 h-4" />
+            <UserIcon className="w-4 h-4" />
           </Button>
         </div>
       </header>
@@ -293,7 +296,7 @@ export default function Home() {
             )}
 
             {/* Children Cards */}
-            {children.map((child: any) => (
+            {children.map((child: Child) => (
               <ChildCard key={child.id} child={child} />
             ))}
             
