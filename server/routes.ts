@@ -1,8 +1,11 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema, insertChildSchema, insertPregnancySchema, insertCommunityPostSchema } from "@shared/schema";
-import { z } from "zod";
+import { InsertUser, 
+  InsertChild, 
+  InsertPregnancy, 
+  InsertCommunityPost 
+} from "./schema";
 import admin from 'firebase-admin';
 import { getKepiSchedule, generateVaccinationSchedule, getNextVaccination } from "./services/kepi-schedule";
 import { getAncGuidelines, calculatePregnancyWeeks, generateAncSchedule } from "./services/anc-guidelines";
